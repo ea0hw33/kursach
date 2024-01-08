@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        @media print {
+          .not-print-area, .not-print-area * {
+            display: none;
+          }
+        } 
+      </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Научные работы</title>
+</head>
+<body>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+        <h1>Научные работы</h1>
+        <ul class="list-group">
+            {% for nir in object_list %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="font-weight-bold">{{ nir.date_start|date }}</span> - {{ nir.name }} - {{ nir.Fakultet.name }}
+                        </div>
+                        <div>
+                            <span class="badge badge-primary">{{ nir.get_type_display }}</span>
+                            <div class="not-print-area">
+                            <a href="{{ nir.get_absolute_url }}" class="btn btn-sm btn-info not-print-area">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-4 not-print-area">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Фильтры</h5>
+                <form id="filterForm" method="get" action="">
+                    <div class="form-group">
+                        <label for="facultyFilter">Факультет</label>
+                        <select class="form-control" name="faculty" id="facultyFilter">
+                            <option value="all">Все</option>
+                            {% for f in facultys %}
+                            <option value="{{f.id}}">{{f.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="typeFilter">Тип работы</label>
+                        <select class="form-control" name="type" id="typeFilter">
+                            <option value="all">Все</option>
+                            <option value="ol">Олимпиада</option>
+                            <option value="vs">Выставка</option>
+                            <option value="kf">Конференция</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateFilter">Год</label>
+                        <select class="form-control" name="year" id="dateFilter">
+                            <option value="all">Все</option>
+                            <option>2024</option>
+                            <option>2023</option>
+                            <option>2022</option>
+                            <option>2021</option>
+                            <option>2020</option>
+                            <option>2019</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" onclick="submitForm()">Отфильтровать</button>
+                    <button type="button" class="btn btn-primary btn-block" id="printBtn">Напечатать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+
+    document.getElementById('printBtn').addEventListener('click', () => { window.print() });
+    // Prints area to which class was assigned only
+  
+  </script>
+
+<script>
+    function submitForm() {
+        var form = document.getElementById('filterForm');
+        var facultyFilter = form.elements['facultyFilter'].value;
+        var typeFilter = form.elements['typeFilter'].value;
+        var dateFilter = form.elements['dateFilter'].value;
+
+        if (facultyFilter === 'all') {
+            form.elements['facultyFilter'].disabled = true;
+        }
+
+        if (typeFilter === 'all') {
+            form.elements['typeFilter'].disabled = true;
+        }
+
+        if (dateFilter === 'all') {
+            form.elements['dateFilter'].disabled = true;
+        }
+
+        form.submit();
+    }
+</script>
+</body>
+</html>
