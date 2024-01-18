@@ -28,12 +28,50 @@
                         </div>
                         <div>
                             <span class="badge badge-primary">{{ nir.get_type_display }}</span>
-                            <div class="not-print-area">
-                            <a href="{{ nir.get_absolute_url }}" class="btn btn-sm btn-info not-print-area">Подробнее</a>
-                            </div>
                         </div>
                     </div>
+                {% for key, value in participants2.items %}
+                    {% if key == nir.pk and value == True %}
+                    <li class="list-group-item">
+                    <div>          
+                        <h4>Участники:</h4>
+                        {% for p in participants %}
+                        {% if p.nir.pk == nir.pk %}
+                            <span>{{p.user}}</span><br>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    </li>
+                    {% endif %}
+                {%endfor%}
+                {% for key, value in orgcomit2.items %}
+                {% if key == nir.pk and value == True %}
+                <li class="list-group-item">
+                    <div>      
+                        <h4>Оргкомитет:</h4>
+                        {% for p in orgcomit %}
+                        {% if p.nir.pk == nir.pk %}
+                            <span>{{p.user}}</span><br>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
                 </li>
+                {% endif %}
+                {% endfor %}
+                {% for key, value in listeners2.items %}
+                {% if key == nir.pk and value == True %}
+                <li class="list-group-item">
+                    <div>      
+                        <h4>Слушатели:</h4>
+                        {% for p in listeners %}
+                        {% if p.nir.pk == nir.pk %}
+                            <span>{{p.user}}</span><br>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </li>
+                {% endif %}
+                {% endfor %}
             {% endfor %}
         </ul>
     </div>
@@ -61,15 +99,16 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="dateFilter">Год</label>
-                        <select class="form-control" name="year" id="dateFilter">
+                        <label for="dateFilterType">Тип фильтрации по дате</label>
+                        <select class="form-control" id="dateFilterType" name="dateFilterType" onchange="toggleDateInput()">
                             <option value="all">Все</option>
-                            <option>2024</option>
-                            <option>2023</option>
-                            <option>2022</option>
-                            <option>2021</option>
-                            <option>2020</option>
+                            <option value="day">По дате</option>
+                            <option value="year">По году</option>
                         </select>
+                    </div>
+                    <div class="form-group" id="dateFilterGroup" style="display: none;">
+                        <label for="dateFilter">Дата начала</label>
+                        <input type="date" class="form-control" id="dateFilter" name="dateFilter">
                     </div>
                     <button type="submit" class="btn btn-primary btn-block" onclick="submitForm()">Отфильтровать</button>
                     <button type="button" class="btn btn-primary btn-block" id="printBtn">Напечатать</button>
@@ -87,14 +126,27 @@
 
     document.getElementById('printBtn').addEventListener('click', () => { window.print() });
     // Prints area to which class was assigned only
-  
-  </script>
+</script>
 
 <script>
+    function toggleDateInput() {
+        var dateFilterType = document.getElementById('dateFilterType').value;
+        var dateFilterGroup = document.getElementById('dateFilterGroup');
+        
+        if (dateFilterType === 'all') {
+            dateFilterGroup.style.display = 'none';
+        } else {
+            dateFilterGroup.style.display = 'block';
+            var dateFilter = document.getElementById('dateFilter');
+            dateFilter.type = dateFilterType === 'day' ? 'date' : 'number';
+        }
+    }
+
     function submitForm() {
         var form = document.getElementById('filterForm');
         var facultyFilter = form.elements['facultyFilter'].value;
         var typeFilter = form.elements['typeFilter'].value;
+        var dateFilterType = form.elements['dateFilterType'].value;
         var dateFilter = form.elements['dateFilter'].value;
 
         if (facultyFilter === 'all') {
@@ -105,7 +157,8 @@
             form.elements['typeFilter'].disabled = true;
         }
 
-        if (dateFilter === 'all') {
+        if (dateFilterType === 'all') {
+            form.elements['dateFilterType'].disabled = true;
             form.elements['dateFilter'].disabled = true;
         }
 

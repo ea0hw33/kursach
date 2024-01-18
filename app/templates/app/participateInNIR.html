@@ -22,40 +22,11 @@
     {% endfor %}
 
 <div class="container mt-5">
-    <h2>Выберите должность</h2>
-    <div id="positionSlider" class="carousel slide">
-        <div class="carousel-inner">
-            <div class="carousel-item {% if job == 'student' or job is defined %} active {% endif %}">
-                <h3>Студент</h3>
-            </div>
-            <div class="carousel-item {% if job == 'employee' %} active {% endif %}">
-                <h3>Сотрудник</h3>
-            </div>
-        </div>
-        <a class="carousel-control-prev" href="#positionSlider" role="button" data-slide="prev" style="width: 10%; left: 0;">
-            <span class="sr-only">Previous</span>
-        </a>
-    </div>
-
+    {% if user.user_type == 'student' %}
     <!-- Форма для студента -->
-    <div id="studentForm" class="mt-4" {% if job == 'employee' %} style="display: none;" {% endif %}>
+    <div id="studentForm" class="mt-4">
         <form action= {{ request.get_full_path }} method="post">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="studentId">Номер зачетки</label>
-                <input type="number" class="form-control {% for message in messages %}
-                {% if "Студент не найден"|make_list == message|make_list %}
-                is-invalid
-                {%endif%}
-                {% endfor %}" name="studentId" placeholder="Введите номер зачетки" id="replyNumber" min="0" step="1" data-bind="value:replyNumber" required>
-                {% for message in messages %}
-                {% if "Студент не найден"|make_list == message|make_list %}
-                <div class="invalid-feedback d-block">
-                    Студент не найден
-                  </div>
-                {%endif%}
-                {% endfor %}
-            </div>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="participantCheckbox">
                 <label class="form-check-label" for="participantCheckbox">Участник</label>
@@ -63,27 +34,12 @@
             <button type="submit" class="btn btn-primary mt-3">Записаться</button>
         </form>
     </div>
-
+    {% endif %}
+    {% if user.user_type == 'employee' %}
     <!-- Форма для сотрудника -->
-    <div id="employeeForm" class="mt-4" {% if job == 'student' or job is defined %} style="display: none;" {% endif %}>
+    <div id="employeeForm" class="mt-4">
         <form action= {{ request.get_full_path }} method="post">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="employeeId">Номер сотрудника</label>
-                <input type="number" class="form-control                
-                {% for message in messages %}
-                {% if "Сотрудник не найден"|make_list == message|make_list %}
-                    is-invalid
-                {%endif%}
-                {% endfor %}" name="employeeId" placeholder="Введите номер сотрудника" id="replyNumber" min="0" step="1" data-bind="value:replyNumber" required>
-                {% for message in messages %}
-                {% if "Сотрудник не найден"|make_list == message|make_list %}
-                <div class="invalid-feedback d-block">
-                    Сотрудник не найден
-                  </div>
-                {%endif%}
-                {% endfor %}
-            </div>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="participantCheckbox">
                 <label class="form-check-label" for="participantCheckbox">Участник</label>
@@ -95,29 +51,13 @@
             <button type="submit" class="btn btn-primary mt-3">Записаться</button>
         </form>
     </div>
+    {% endif %}
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script>
-    $('.carousel').carousel({
-        interval: false,
-      });
-
-    $('#positionSlider').on('slide.bs.carousel', function (e) {
-        var slideFrom = $(this).find('.active').index();
-        var targetIndex = $(e.relatedTarget).index();
-        if (targetIndex === 0) {
-            $('#studentForm').show();
-            $('#employeeForm').hide();
-        } else if (targetIndex === 1) {
-            $('#studentForm').hide();
-            $('#employeeForm').show();
-        }
-    });
-</script>
 
 </body>
 </html>

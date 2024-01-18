@@ -32,13 +32,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'app',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +52,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'kursush.urls'
+
 
 TEMPLATES = [
     {
@@ -69,6 +70,8 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTH_USER_MODEL = 'app.CustomUser'
 
 WSGI_APPLICATION = 'kursush.wsgi.application'
 
