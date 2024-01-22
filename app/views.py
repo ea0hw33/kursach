@@ -36,9 +36,12 @@ def user_login(request):
                     login(request, user)
                     return redirect('index')
                 else:
-                    return HttpResponse('Disabled account')
+                    messages.add_message(request, messages.ERROR,'Аккаунт не активен')  
+                    return render(request, 'login.html', {'form': form})
+
             else:
-                return HttpResponse('Invalid login')
+                messages.add_message(request, messages.ERROR,'Неверный логин или пароль')  
+                return render(request, 'login.html', {'form': form})
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
@@ -68,24 +71,30 @@ class NIRview(ListView):
         type_nir = self.request.GET.get('type', ['vs', 'ol', 'kf'])
         if type(type_nir) is str:
             type_nir = [type_nir]
-        year = self.request.GET.get('dateFilter', available_years)
-        if type(year) is int:
-            year = [int(year)]
-        
+            
         if 'dateFilterType' in self.request.GET and self.request.GET['dateFilterType'] == 'day':
-                new_context = NIR.objects.filter(
-                    Fakultet__id__in=faculty,
-                    type__in = type_nir, 
-                    date_start = self.request.GET['dateFilter']
-                )
+            dateformat = '%Y-%m-%d'
+            date = self.request.GET['dateFilter']
+            date = datetime.datetime.strptime(date, dateformat)
+            new_context = NIR.objects.order_by('-date_start').filter(
+                Fakultet__id__in=faculty,
+                type__in = type_nir, 
+                date_start__year = date.year,
+                date_start__month = date.month,
+                date_start__day = date.day
+            )
         else:
-            new_context = NIR.objects.filter(
+            year = self.request.GET.get('dateFilter', available_years)
+            if type(year) is str:
+                year = [int(year)]
+            new_context = NIR.objects.order_by('-date_start').filter(
                 Fakultet__id__in=faculty,
                 type__in = type_nir, 
                 date_start__year__in = year
             )
         
         return new_context
+
     
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if request.user.user_type != 'department_head':
@@ -96,6 +105,12 @@ class NIRview(ListView):
 class NIRviewHead(ListView):
     model = NIR
     template_name = "nir_list_head.html"
+    
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if request.user.user_type == 'department_head':
+            return super().get(request, *args, **kwargs)   
+        else:
+            return redirect('index')
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super(NIRviewHead, self).get_context_data(**kwargs)
@@ -147,7 +162,7 @@ class NIRviewHead(ListView):
             dateformat = '%Y-%m-%d'
             date = self.request.GET['dateFilter']
             date = datetime.datetime.strptime(date, dateformat)
-            new_context = NIR.objects.filter(
+            new_context = NIR.objects.order_by('-date_start').filter(
                 Fakultet__id__in=faculty,
                 type__in = type_nir, 
                 date_start__year = date.year,
@@ -158,7 +173,7 @@ class NIRviewHead(ListView):
             year = self.request.GET.get('dateFilter', available_years)
             if type(year) is str:
                 year = [int(year)]
-            new_context = NIR.objects.filter(
+            new_context = NIR.objects.order_by('-date_start').filter(
                 Fakultet__id__in=faculty,
                 type__in = type_nir, 
                 date_start__year__in = year

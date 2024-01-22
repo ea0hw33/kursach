@@ -176,7 +176,7 @@ class orgkomitety(models.Model):
     isParticipent = models.BooleanField(default=False)
     
     def __str__(self) -> str:
-        return f'{self.nir}|{self.sotrudnik}'
+        return f'{self.nir}|{self.user}'
 
     class Meta:
         verbose_name = 'Оргкомитет НИРа'

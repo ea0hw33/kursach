@@ -15,11 +15,27 @@
 </head>
 <body>
 
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Научные работы</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <!-- Добавленная кнопка Logout -->
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Выйти</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8">
         <h1>Научные работы</h1>
         <ul class="list-group">
+            {% if object_list %}
             {% for nir in object_list %}
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
@@ -35,6 +51,9 @@
                     </div>
                 </li>
             {% endfor %}
+            {% else %}
+            <h4 class="p-5 text-center">Научные работы отсутствуют, попробуйте применить другой фильтр</h4>
+            {% endif %}
         </ul>
     </div>
     <div class="col-md-4 not-print-area">
@@ -61,15 +80,16 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="dateFilter">Год</label>
-                        <select class="form-control" name="year" id="dateFilter">
+                        <label for="dateFilterType">Тип фильтрации по дате</label>
+                        <select class="form-control" id="dateFilterType" name="dateFilterType" onchange="toggleDateInput()">
                             <option value="all">Все</option>
-                            <option>2024</option>
-                            <option>2023</option>
-                            <option>2022</option>
-                            <option>2021</option>
-                            <option>2020</option>
+                            <option value="day">По дате</option>
+                            <option value="year">По году</option>
                         </select>
+                    </div>
+                    <div class="form-group" id="dateFilterGroup" style="display: none;">
+                        <label for="dateFilter">Дата начала</label>
+                        <input type="date" class="form-control" id="dateFilter" name="dateFilter">
                     </div>
                     <button type="submit" class="btn btn-primary btn-block" onclick="submitForm()">Отфильтровать</button>
                     <button type="button" class="btn btn-primary btn-block" id="printBtn">Напечатать</button>
@@ -87,14 +107,27 @@
 
     document.getElementById('printBtn').addEventListener('click', () => { window.print() });
     // Prints area to which class was assigned only
-  
-  </script>
+</script>
 
 <script>
+    function toggleDateInput() {
+        var dateFilterType = document.getElementById('dateFilterType').value;
+        var dateFilterGroup = document.getElementById('dateFilterGroup');
+        
+        if (dateFilterType === 'all') {
+            dateFilterGroup.style.display = 'none';
+        } else {
+            dateFilterGroup.style.display = 'block';
+            var dateFilter = document.getElementById('dateFilter');
+            dateFilter.type = dateFilterType === 'day' ? 'date' : 'number';
+        }
+    }
+
     function submitForm() {
         var form = document.getElementById('filterForm');
         var facultyFilter = form.elements['facultyFilter'].value;
         var typeFilter = form.elements['typeFilter'].value;
+        var dateFilterType = form.elements['dateFilterType'].value;
         var dateFilter = form.elements['dateFilter'].value;
 
         if (facultyFilter === 'all') {
@@ -105,7 +138,8 @@
             form.elements['typeFilter'].disabled = true;
         }
 
-        if (dateFilter === 'all') {
+        if (dateFilterType === 'all') {
+            form.elements['dateFilterType'].disabled = true;
             form.elements['dateFilter'].disabled = true;
         }
 
